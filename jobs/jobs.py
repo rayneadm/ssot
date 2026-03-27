@@ -1,3 +1,4 @@
+print("JOBS.PY LOADED")
 from nautobot.apps.jobs import Job, register_jobs
 
 class TestJob(Job):
@@ -8,3 +9,4 @@ class TestJob(Job):
         self.logger.info("SSOT repo works")
 
 register_jobs(TestJob)
+print("JOBS.PY LOADED")
