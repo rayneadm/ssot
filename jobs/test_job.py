@@ -1,3 +1,4 @@
+print("LOADED TEST_JOB MODULE")
 from nautobot.apps.jobs import Job
 
 class TestJob(Job):
