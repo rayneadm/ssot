@@ -1,6 +1,9 @@
-from nautobot.apps.jobs import Job, ObjectVar
+from nautobot.extras.jobs import Job, ObjectVar, register_jobs
 from nautobot.extras.models import ExternalIntegration
-from nautobot.extras.choices import SecretsGroupAccessTypeChoices, SecretsGroupSecretTypeChoices
+from nautobot.extras.choices import (
+    SecretsGroupAccessTypeChoices,
+    SecretsGroupSecretTypeChoices,
+)
 
 import requests
 
@@ -15,11 +18,8 @@ class NetBoxTestJob(Job):
 
     class Meta:
         name = "NetBox Test API"
-        description = "Test connection to NetBox via External Integration"
 
     def run(self, source):
-        self.logger.info(f"Using NetBox: {source.name}")
-
         url = source.remote_url
 
         token = source.secrets_group.get_secret_value(
@@ -27,22 +27,14 @@ class NetBoxTestJob(Job):
             secret_type=SecretsGroupSecretTypeChoices.TYPE_TOKEN,
         )
 
-        headers = {
-            "Authorization": f"Token {token}",
-            "Accept": "application/json",
-        }
+        response = requests.get(
+            f"{url}/api/status/",
+            headers={"Authorization": f"Token {token}"},
+            timeout=10,
+        )
 
-        api_url = f"{url}/api/status/"
-
-        response = requests.get(api_url, headers=headers, timeout=10)
-
-        self.logger.info(f"Status code: {response.status_code}")
-
-        if response.ok:
-            self.logger.info(f"Response: {response.json()}")
-        else:
-            self.logger.error(f"Error: {response.text}")
+        self.logger.info(response.status_code)
 
 
-# 🔥 ВОТ ЭТО КЛЮЧЕВОЕ
-jobs = [NetBoxTestJob]
+# 🔥 обязательно
+register_jobs(NetBoxTestJob)
