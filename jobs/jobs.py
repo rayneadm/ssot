@@ -22,7 +22,6 @@ class NetBoxTestJob(Job):
 
         url = source.remote_url
 
-        # получаем токен из SecretsGroup
         token = source.secrets_group.get_secret_value(
             access_type=SecretsGroupAccessTypeChoices.TYPE_HTTP,
             secret_type=SecretsGroupSecretTypeChoices.TYPE_TOKEN,
@@ -35,8 +34,6 @@ class NetBoxTestJob(Job):
 
         api_url = f"{url}/api/status/"
 
-        self.logger.info(f"Requesting: {api_url}")
-
         response = requests.get(api_url, headers=headers, timeout=10)
 
         self.logger.info(f"Status code: {response.status_code}")
@@ -45,3 +42,7 @@ class NetBoxTestJob(Job):
             self.logger.info(f"Response: {response.json()}")
         else:
             self.logger.error(f"Error: {response.text}")
+
+
+# 🔥 ВОТ ЭТО КЛЮЧЕВОЕ
+jobs = [NetBoxTestJob]
